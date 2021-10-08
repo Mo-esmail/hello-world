@@ -124,6 +124,7 @@ jobs:
           name: Font-end security scan
           command: |
             cd frontend
+            npm audit fix --audit-level=critical
             npm audit --audit-level=critical
 
 
@@ -138,6 +139,7 @@ jobs:
           name: Back-end security scan
           command: |
             cd backend
+            npm audit fix --audit-level=critical
             npm audit --audit-level=critical
 
 
