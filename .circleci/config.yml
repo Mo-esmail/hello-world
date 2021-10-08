@@ -27,10 +27,7 @@ commands:
 
   revert-migrations:
     description: Revert the last migration if successfully run in the current workflow.
-    # parameters:
     steps:
-      # Trigger rollback jobs if the smoke tests or any following jobs fail.
-      # Revert the last migration (IF a new migration was applied) on the database to that it goes back to the way it was before. You can use that value you saved in MemStash.io to know if you should revert any migrations.
       - run:
           name: Revert migrations
           when: on_fail
@@ -184,7 +181,7 @@ jobs:
     steps:
       - checkout
       - add_ssh_keys:
-          fingerprints: ["9a:02:61:b5:1b:ea:b5:aa:02:78:9e:e5:80:f3:7c:1a"]
+          fingerprints: ["44:15:c5:a1:ff:78:3d:05:18:23:5c:f0:ae:33:3c:f5"]
       - attach_workspace:
           at: ~/
       - run:
@@ -307,7 +304,7 @@ jobs:
     steps:
       - checkout
       - add_ssh_keys:
-          fingerprints: ["9a:02:61:b5:1b:ea:b5:aa:02:78:9e:e5:80:f3:7c:1a"]
+          fingerprints: ["44:15:c5:a1:ff:78:3d:05:18:23:5c:f0:ae:33:3c:f5"]
       - attach_workspace:
           at: ~/
       - run:
