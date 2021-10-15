@@ -2,7 +2,7 @@ version: 2.1
 
 orbs:
   aws-cli: circleci/aws-cli@1.3.0
-
+  
 parameters:
   workflow-id:
     type: string
@@ -10,7 +10,7 @@ parameters:
   memstash-token:
     type: string
     default: "b9461c43-6888-4d04-8e76-7beeddbb863c"
-
+    
 commands:
   destroy-environment:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
@@ -25,25 +25,23 @@ commands:
             aws cloudformation delete-stack \
               --stack-name "udapeople-frontend-<< pipeline.parameters.workflow-id >>"
 
+
   revert-migrations:
-    description: Revert the last migration if successfully run in the current workflow.
-    # parameters:
+    description: Revert the last migration if successfully run in the current workflow. 
     steps:
-      # Trigger rollback jobs if the smoke tests or any following jobs fail.
-      # Revert the last migration (IF a new migration was applied) on the database to that it goes back to the way it was before. You can use that value you saved in MemStash.io to know if you should revert any migrations.
       - run:
           name: Revert migrations
           when: on_fail
           command: |
             # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
             export SUCCESS=$(curl -H "token: << pipeline.parameters.memstash-token >>" --request GET https://api.memstash.io/values/migration_${CIRCLE_WORKFLOW_ID})
-            if(( $SUCCESS==1 ));
+            if(( $SUCCESS==1 )); 
             then
               cd ~/project/backend
               npm install
               npm run migrations:revert
             fi
-
+            
 jobs:
   build-frontend:
     docker:
@@ -56,13 +54,11 @@ jobs:
           name: Build front-end
           command: |
             cd frontend
-            sudo npm install webpack-dev-server -g
-            sudo npm install
-            sudo npm run build
+            npm install
+            npm run build
       - save_cache:
           paths: [frontend/node_modules]
-          key: frontend-build  # -<< pipeline.id >>
-
+          key: frontend-build
 
   build-backend:
     docker:
@@ -79,11 +75,7 @@ jobs:
             npm run build
       - save_cache:
           paths: [backend/node_modules]
-          key: backend-build  # -<< pipeline.id >>
-      - save_cache:
-          paths: [backend/dist]
-          key: backend-dist  # -<< pipeline.id >>
-
+          key: backend-build
 
   test-frontend:
     docker:
@@ -91,27 +83,26 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: ["frontend-build"]  # -<< pipeline.id >>"
-      - run:
+          keys: ["frontend-build"]
+                - run:
           name: Font-end test
           command: |
             cd frontend
             npm run test
-
-
+                
   test-backend:
     docker:
       - image: circleci/node:13.8.0
     steps:
       - checkout
       - restore_cache:
-          keys: ["backend-build"]  # -<< pipeline.id >>"
+          keys: ["backend-build"]
       - run:
           name: Back-end test
           command: |
             cd backend
             npm run test
-
+            
 
   scan-frontend:
     docker:
@@ -119,14 +110,12 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: ["frontend-build"]  # -<< pipeline.id >>"
+          keys: ["frontend-build"]
       - run:
           name: Font-end security scan
           command: |
             cd frontend
-            npm install
-            npm audit fix --audit-level=critical
-
+            npm audit --audit-level=critical
 
   scan-backend:
     docker:
@@ -134,17 +123,16 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: ["backend-build"]  # -<< pipeline.id >>"
+          keys: ["backend-build"]
       - run:
           name: Back-end security scan
           command: |
             cd backend
-            npm audit fix --audit-level=critical
-
+            npm audit --audit-level=critical
 
   deploy-infrastructure:
     docker:
-      - image: cimg/base:2020.01
+      - image: circleci/node:13.8.0
     steps:
       - checkout
       - aws-cli/setup
@@ -180,11 +168,11 @@ jobs:
 
   configure-infrastructure:
     docker:
-      - image: python:3.7-alpine3.11
+      - image: circleci/node:13.8.0
     steps:
       - checkout
       - add_ssh_keys:
-          fingerprints: ["44:15:c5:a1:ff:78:3d:05:18:23:5c:f0:ae:33:3c:f5"]
+          fingerprints: ["9a:02:61:b5:1b:ea:b5:aa:02:78:9e:e5:80:f3:7c:1a"]
       - attach_workspace:
           at: ~/
       - run:
@@ -225,8 +213,6 @@ jobs:
     steps:
       - checkout
       - aws-cli/setup
-      # - restore_cache:
-      #     keys: ["backend-build"]
       - run:
           name: Run migrations
           command: |
@@ -260,7 +246,7 @@ jobs:
               --request PUT --data "1" \
               https://api.memstash.io/values/migration_${CIRCLE_WORKFLOW_ID}
       - revert-migrations
-      - destroy-environment
+      - destroy-environment 
 
   deploy-frontend:
     docker:
@@ -299,21 +285,21 @@ jobs:
           command: |
             aws s3 cp --recursive frontend/dist "s3://udapeople-<< pipeline.parameters.workflow-id >>"
       - revert-migrations
-      - destroy-environment
-
+      - destroy-environment    
+                    
   deploy-backend:
     docker:
-      - image: python:3.7-alpine3.11
+      - image: circleci/node:13.8.0
     steps:
       - checkout
       - add_ssh_keys:
-          fingerprints: ["44:15:c5:a1:ff:78:3d:05:18:23:5c:f0:ae:33:3c:f5"]
+          fingerprints: ["9a:02:61:b5:1b:ea:b5:aa:02:78:9e:e5:80:f3:7c:1a"]
       - attach_workspace:
           at: ~/
       - run:
           name: Install dependencies
           command: |
-            apk add --update ansible openssh-client tar gzip
+            apk add --update ansible openssh-client tar gzip 
       - restore_cache:
           keys: ["backend-dist"]  # -<< pipeline.id >>
       - run:
@@ -338,7 +324,7 @@ jobs:
 
   smoke-test:
     docker:
-      - image: python:3.7-alpine3.11
+      - image: circleci/node:13.8.0
     steps:
       - checkout
       - run:
@@ -378,11 +364,11 @@ jobs:
           command: |
             apk add --update py3-pip && pip3 install --upgrade pip && pip3 install awscli
       - revert-migrations
-      - destroy-environment
-
+      - destroy-environment 
+      
   cloudfront-update:
     docker:
-      - image: python:3.7-alpine3.11
+      - image: circleci/node:13.8.0
     steps:
       - checkout
       - run:
@@ -416,7 +402,7 @@ jobs:
 
   cleanup:
     docker:
-      - image: cimg/base:2020.01
+      - image: circleci/node:13.8.0
     steps:
       - checkout
       - aws-cli/setup
@@ -432,6 +418,7 @@ jobs:
               aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
               aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
             fi
+            
 
 workflows:
   default:
@@ -442,22 +429,22 @@ workflows:
           requires: [build-frontend]
       - test-backend:
           requires: [build-backend]
-      - scan-frontend:
-          requires: [build-frontend]
       - scan-backend:
           requires: [build-backend]
+      - scan-frontend:
+          requires: [build-frontend]
       - deploy-infrastructure:
           requires: [test-frontend, test-backend, scan-frontend, scan-backend]
           filters:
             branches:
-              only: [main]
+              only: [test-feature-branch]
       - configure-infrastructure:
           requires: [deploy-infrastructure]
       - run-migrations:
           requires: [configure-infrastructure]
-      - deploy-backend:
-          requires: [run-migrations]
       - deploy-frontend:
+          requires: [run-migrations]
+      - deploy-backend:
           requires: [run-migrations]
       - smoke-test:
           requires: [deploy-backend, deploy-frontend]
@@ -465,4 +452,3 @@ workflows:
           requires: [smoke-test]
       - cleanup:
           requires: [cloudfront-update]
-
