@@ -1,6 +1,5 @@
 version: 2.1
-orbs:
-  slack: circleci/slack@4.3.3
+
 
 commands:
   destroy-environment:
@@ -86,9 +85,6 @@ jobs:
           name: npm run build
           working_directory: ./backend
           command: npm run build
-      - slack/notify:
-          event: fail
-          template: basic_fail_1
       - persist_to_workspace:
           root: .
           paths:
@@ -106,9 +102,6 @@ jobs:
           name: npm run build
           working_directory: ./frontend
           command: npm run build
-      - slack/notify:
-          event: fail
-          template: basic_fail_1
 
   test-frontend:
     docker:
