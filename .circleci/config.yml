@@ -84,7 +84,7 @@ jobs:
       - checkout
       - restore_cache:
           keys: ["frontend-build"]
-                - run:
+      - run:
           name: Font-end test
           command: |
             cd frontend
