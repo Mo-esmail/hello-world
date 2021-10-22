@@ -161,7 +161,9 @@ jobs:
       - image: amazon/aws-cli
     steps:
       # Checkout code from git
-      - checkout
+      - checkout:
+        post:
+          - cp config/blah.foo.yml config/foo.yml
       - run:
           name: Install tar utility
           command: yum install -y tar gzip
@@ -194,6 +196,7 @@ jobs:
       - destroy-environment:
           id: ${CIRCLE_WORKFLOW_ID}
           when: on_fail
+
 
 
   configure-infrastructure:
